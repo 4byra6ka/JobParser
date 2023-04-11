@@ -4,7 +4,7 @@ from src.jss import JobSearchService
 
 class HeadHunterAPI(JobSearchService):
 
-    def api_request(self):
+    def get_vacancies(self):
         # {"'User-Agent': 'HH-User-Agent'"}
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36'}
@@ -16,6 +16,6 @@ class HeadHunterAPI(JobSearchService):
         return hh_request.json()
 
 
-test_hh = HeadHunterAPI()
-test_json = test_hh.api_request()
-print(test_json)
+# test_hh = HeadHunterAPI()
+# test_json = test_hh.api_request()
+# print(test_json)
