@@ -7,71 +7,81 @@ from datetime import datetime
 
 
 class SearchVacancies(JsonFile):
-    def __init__(self, name_vacancy: str = None, city: str = None, salary_from=None):
+    def __init__(self, name_vacancy: str = None, salary_from=None):
         self.name_vacancy = name_vacancy    # Условие для поиска Вакансии
-        self.city = city                    # Условие для поиска по городу
+        self.count_vacancy = 0              # Кол-во вакансий
         self.salary_from = salary_from      # Условие для поиска от заданной ЗП
         self.__list_vacancy = []            # Список найденных вакансий
         super().__init__()
         self.current_vacancy_data = int     # Дата первой вакансии для обновления запроса
 
-    def add_vacancy(self):
+    def add_vacancy(self, **kwargs):
+        """Добавление текущего запроса вакансии в файл"""
         data = {}
         self.__list_vacancy = sorted(self.__list_vacancy, key=lambda vacancy: vacancy.date_published, reverse=True)
-        data[f'{self.name_vacancy} {self.city} {self.salary_from}'] = [one_vacancy.__dict__ for one_vacancy in self.__list_vacancy]
+        data[f'{self.name_vacancy} {self.salary_from}'] = [one_vacancy.__dict__ for one_vacancy in self.__list_vacancy]
         super().add_vacancy(data)
+        self.__list_vacancy = []
 
     def sel_vacancy(self, value_vacancy):
+        """Загрузить данные выбранной вакансии"""
         for dict_vacancy in super().sel_vacancy(value_vacancy):
             self.__list_vacancy.append(Vacancy(**dict_vacancy))
-        # self.сurrent_vacancy[value_vacancy] = self.__list_vacancy[0].date_published
         self.current_vacancy_data = self.__list_vacancy[0].date_published
 
-    def del_vacancy(self):
-        super().del_vacancy(f'{self.name_vacancy} {self.city} {self.salary_from}')
+    def del_vacancy(self, **kwargs):
+        """Удаление текущей выбранной вакансии"""
+        super().del_vacancy(f'{self.name_vacancy} {self.salary_from}')
+        self.__list_vacancy = []
 
     def list_value_vacancy(self):
+        """Вывод списка архивных запросов по вакансиям"""
         if not self.archive_vacancy == {}:
-            print(f"\nВаши запросы по поиску вакансии:\n{'*' * 32}")
-            for namber_item, vacancy_item in self.archive_vacancy.items():
-                print(f"{namber_item}: {vacancy_item}")
+            print(f"\nВаши прошлые запросы по поиску вакансии:\n{'*' * 32}")
+            for number_item, param_vacancy_item in self.archive_vacancy.items():
+                vacancy_item = param_vacancy_item.split(" ")
+                if vacancy_item[1] == "":
+                    salary_item = "ЗП не указано"
+                else:
+                    salary_item = f"ЗП от {vacancy_item[1]}"
+                print(f"{number_item}: Запрос поиска: {vacancy_item[0]} {salary_item} "
+                      f"(Найдено вакансий:{vacancy_item[2]})")
             print(f"{'*' * 32}")
         else:
             print(f"\nМеню:\n{'*' * 32}")
 
         print(f"9: Новый поиск")
         print(f"0: Выход")
-        return True
 
     def menu_search(self):
-        if len(self.archive_vacancy) <= 8:
+        """Меню для поиска новой вакансии"""
+        if len(self.archive_vacancy) < 8:
             self.name_vacancy = input("Введите поисковый запрос вакансий: ")
-            self.city = input("Введите город в котором нужно найти вакансий или нажми 'Enter' для поиска везде: ")
+            # self.city = input("Введите город в котором нужно найти вакансий или нажми 'Enter' для поиска везде: ")
             self.salary_from = input("Введите ЗП от для вакансий или нажми 'Enter' если не нужно : ")
             self.find_vacancy()
             self.add_vacancy()
             super().check_file()
         else:
-            print("\nПривышин лимит запросов. Не может быть больше 8 запросов. Удалите!!!\n")
+            print("\nПревышен лимит запросов. Не может быть больше 8 запросов. Удалите!!!\n")
 
     def menu_query(self, position_menu):
+        """Меню действий в выбранном запросе вакансий"""
         if position_menu in self.archive_vacancy.keys():
-            self.name_vacancy, self.city, self.salary_from = self.archive_vacancy[1].split(" ")
-            self.sel_vacancy(self.archive_vacancy[1])
-            # if (datetime.utcnow() - datetime.fromtimestamp(self.сurrent_vacancy_data)).seconds > 3600:
-            #     print("\nУстарели вакансии более чем на час. Обновляю вакансии по текущему запросу.")
-            #     self.find_vacancy()
-            #     self.add_vacancy()
-            #     self.sel_vacancy(self.archive_vacancy[1])
+            self.name_vacancy, self.salary_from, self.count_vacancy = self.archive_vacancy[position_menu].split(" ")
+            self.sel_vacancy(f"{self.name_vacancy} {self.salary_from}")
+
             text_menu_query = {
                 1: "Вывести все вакансии в сортированном виде по дате публикации",
                 2: "Вывести ТОП N Вакансий по минимальному порогу ЗП",
                 3: "Вывести вакансии по ключевому слову в описании",
                 4: "Удаление запроса",
             }
-            [print(f"{namber_item}: {query_item}") for namber_item, query_item in text_menu_query.items()]
-            # position_menu_query = int(input("Введи номер:"))
-            position_menu_query = 2
+            if (datetime.utcnow() - datetime.fromtimestamp(float(self.current_vacancy_data))).seconds > 3600:
+                text_menu_query[5] = "Обновить вакансии по запросу(Вероятно уже есть новые)"
+            [print(f"{number_item}: {query_item}") for number_item, query_item in text_menu_query.items()]
+            position_menu_query = int(input("Введи номер:"))
+            # position_menu_query = 2
             if position_menu_query == 1:
                 print_vacancy(self.__list_vacancy)
             elif position_menu_query == 2:
@@ -82,13 +92,22 @@ class SearchVacancies(JsonFile):
                 print_vacancy(self.keyword_search(query_word))
             elif position_menu_query == 4:
                 self.del_vacancy()
+                self.check_file()
+            elif position_menu_query == 5 and \
+                    (datetime.utcnow() - datetime.fromtimestamp(float(self.current_vacancy_data))).seconds > 3600:
+                self.__list_vacancy = []
+                self.find_vacancy()
+                self.add_vacancy()
+                self.sel_vacancy(f'{self.name_vacancy} {self.salary_from}')
         else:
-            print("Данного запроса нету. Повторите попытку")
+            print("\nДанного запроса нету. Повторите попытку")
 
     def sort_count_salary_min(self, count_view=None):
+        """Сортировка ТОП по минимальному значению зарплаты с N-ым выводом"""
         return sorted(self.__list_vacancy, reverse=True)[:count_view]
 
     def keyword_search(self, keywords: list) -> list:
+        """Поиск в текущем запросе ключевых слов"""
         result_list = []
         data_file: list = self.__list_vacancy
         for item in data_file:
@@ -99,5 +118,8 @@ class SearchVacancies(JsonFile):
         return result_list
 
     def find_vacancy(self):
+        """Запуск поиска вакансий по площадкам HH и SJ"""
         sj = SuperJobAPI()
-        sj.insert_vacancies(self.name_vacancy, self.city, self.salary_from, self.__list_vacancy)
+        sj.insert_vacancies(self.name_vacancy, self.salary_from, self.__list_vacancy)
+        hh = HeadHunterAPI()
+        hh.insert_vacancies(self.name_vacancy, self.salary_from, self.__list_vacancy)

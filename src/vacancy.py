@@ -31,13 +31,15 @@ class Vacancy:
         self.url = url
 
     def __str__(self):
+        """Вывод вакансии"""
         salary = ""
         if self.salary_min != 0:
             salary += f" от {self.salary_min}"
         if self.salary_max != 0:
             salary += f" до {self.salary_max}"
-        return f'{datetime.fromtimestamp(self.date_published)} {self.site}: {self.company_name} {self.city}, ' \
-               f'Опыт: {self.experience}, ЗП:{salary} {self.currency}, {self.url}\nОписание: {self.description[:200]}'
+        return f'{datetime.fromtimestamp(self.date_published)} {self.site}: {self.name}({self.company_name}, ' \
+               f'{self.city}), Опыт: {self.experience}, ЗП:{salary} {self.currency}, {self.url}\n' \
+               f'Описание: {self.description[:200]}'
 
     def __repr__(self):
         return f'{self.__class__.__name__}({self.site}, {self.name}, {self.city}, {self.company_name}, ' \
@@ -45,6 +47,7 @@ class Vacancy:
                f'{self.url}, {self.description})'
 
     def __gt__(self, other):
+        """Сравнение между вакансиями"""
         if not isinstance(other, Vacancy):
             raise TypeError('Аргумент должен быть типом Vacancy')
         if not other.salary_min:
