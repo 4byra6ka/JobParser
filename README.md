@@ -14,8 +14,8 @@
 Прежде чем начать использовать проект по API от SuperJob, необходимо [зарегистрироваться](https://api.superjob.ru/register) и получить `Secret key` для работы
 ***
 ### Разворачивание проект по ООП “Парсер вакансий”
-    git cline https://github.com/4byra6ka/Coursework_module_3.git
-    cd Coursework_module_3
+    git cline https://github.com/4byra6ka/CourseWorkModule4.git
+    cd CourseWorkModule4
     poetry install
+    set SUPERJOB_API_KEY="<Secret key>"
     poetry run main.py
-    poetry run  pytest --cov
