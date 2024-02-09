@@ -2,7 +2,7 @@
 
 ## Проект “Парсер вакансий”
 
-#### Проект модуля 4 парсер по API с площадок вакансий HeadHunter и SuperJob и сохранение его в файл JSON.
+#### Проект парсер по API с площадок вакансий HeadHunter и SuperJob и сохранение его в файл JSON.
 ***
 #### Реализованы операции:
 * Вывод всего списка вакансий
@@ -14,8 +14,8 @@
 Прежде чем начать использовать проект по API от SuperJob, необходимо [зарегистрироваться](https://api.superjob.ru/register) и получить `Secret key` для работы
 ***
 ### Разворачивание проекта “Парсер вакансий”
-    git cline https://github.com/4byra6ka/CourseWorkModule4.git
-    cd CourseWorkModule4
+    git cline https://github.com/4byra6ka/JobParser.git
+    cd JobParser
     poetry install
     set SUPERJOB_API_KEY="<Secret key>"
     poetry run main.py
