@@ -1,6 +1,6 @@
 # <img src="https://notion-emojis.s3-us-west-2.amazonaws.com/prod/svg-twitter/1f99a.svg" width="89"/>
 
-## Курсовой проект по ООП “Парсер вакансий”
+## Проект “Парсер вакансий”
 
 #### Проект модуля 4 парсер по API с площадок вакансий HeadHunter и SuperJob и сохранение его в файл JSON.
 ***
@@ -13,7 +13,7 @@
 ***
 Прежде чем начать использовать проект по API от SuperJob, необходимо [зарегистрироваться](https://api.superjob.ru/register) и получить `Secret key` для работы
 ***
-### Разворачивание проект по ООП “Парсер вакансий”
+### Разворачивание проекта “Парсер вакансий”
     git cline https://github.com/4byra6ka/CourseWorkModule4.git
     cd CourseWorkModule4
     poetry install
